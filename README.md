@@ -27,24 +27,25 @@ Or install it yourself as:
 
 ### Running as a user
 ```
-dockerCloudScriptRunner = DockerCloudScriptRunner.new("username", "api-key-goes-here")
-
-dockerCloudScriptRunner.createAndRunService({
+service = {
 	:image => "debian:jessie",
-	:name => "docker-cloud-runner-example2",
-	:run_command => "timeout 30s sh -c 'for i in `seq 1 80`; do echo $i; sleep 1; done'"
-})
+	:name => "docker-cloud-runner-example",
+	:run_command => "timeout 30s sh -c 'for i in `seq 1 10`; do echo $i; sleep 1; done'"
+}
+
+exit_data = DockerCloudServiceRunner::createAndRunService("username", "api-key-goes-here", service, organization)
+
 ```
 
 ### Running as an organization
 ```
-dockerCloudScriptRunner = DockerCloudScriptRunner.new("username", "api-key-goes-here", "organization")
-
-dockerCloudScriptRunner.createAndRunService({
+service = {
 	:image => "debian:jessie",
-	:name => "docker-cloud-runner-example2",
-	:run_command => "timeout 30s sh -c 'for i in `seq 1 80`; do echo $i; sleep 1; done'"
-})
+	:name => "docker-cloud-runner-example",
+	:run_command => "timeout 30s sh -c 'for i in `seq 1 10`; do echo $i; sleep 1; done'"
+}
+
+exit_data = DockerCloudServiceRunner::createAndRunService("username", "api-key-goes-here", service, "organization")
 ```
 
 ## Development
@@ -55,7 +56,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/searchspring/docker_cloud_service_runner. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/searchspring/docker-cloud-service-runner. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 
 ## License
