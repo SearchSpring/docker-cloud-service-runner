@@ -1,0 +1,16 @@
+#!/usr/local/bin/ruby
+
+require "docker_cloud_service_runner"
+
+service = {
+  :image => "debian:jessie",
+  :name => "docker-cloud-runner-example",
+  :run_command => "timeout 30s sh -c 'for i in `seq 1 5`; do echo $i; sleep 1; done'"
+}
+
+username = ENV["DOCKER_CLOUD_SERVICE_RUNNER_USERNAME"] || "username"
+apikey = ENV["DOCKER_CLOUD_SERVICE_RUNNER_APIKEY"] || "apikey"
+organization = ENV["DOCKER_CLOUD_SERVICE_RUNNER_ORGANIZATION"] || "organization"
+
+exit_data = DockerCloudServiceRunner::createAndRunService(username, apikey, service, organization)
+puts exit_data

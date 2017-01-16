@@ -1,0 +1,4 @@
+app:
+  build: .
+  volumes:
+  - ./:/app/docker_cloud_service_runner
