@@ -1,7 +1,9 @@
 PATH
   remote: .
   specs:
-    docker_cloud_service_runner (0.1.0)
+    docker_cloud_service_runner (0.1.1)
+      rest-client (= 2.0)
+      websocket-eventmachine-client (= 1.2)
 
 GEM
   remote: https://rubygems.org/
@@ -53,9 +55,7 @@ DEPENDENCIES
   bundler (~> 1.13)
   docker_cloud_service_runner!
   rake (~> 10.0)
-  rest-client
-  rspec
-  websocket-eventmachine-client
+  rspec (~> 3.0)
 
 BUNDLED WITH
    1.13.6
