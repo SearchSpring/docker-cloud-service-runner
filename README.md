@@ -25,6 +25,10 @@ Or install it yourself as:
 
 ## Usage
 
+### General usage information
+
+As this runs, it uses websockets to pull log data from Docker Cloud.  This fails often, so we check every 70 seconds to see if we've stopped receiving logs and reconnect if necessary.  In order to prevent unnecessary reconnects, you should output more often than once every 70 seconds.
+
 ### Running as a user
 ```
 service = {
