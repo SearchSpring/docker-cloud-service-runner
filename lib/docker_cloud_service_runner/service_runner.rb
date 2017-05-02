@@ -64,45 +64,56 @@ class ServiceRunner
 
 	def threadLogger(uuid)
 		Thread.new do
-			EM.epoll
-			EM.run do
+			runLogger(uuid)
+		end
+	end
 
-				finished = false
-				Signal.trap("EXIT") { finished = true }
+	def runLogger(uuid)
 
-				ws = WebSocket::EventMachine::Client.connect(
-					:uri => buildURI("wss://ws.cloud.docker.com/api/app/v1/service/#{uuid}/logs/?tail=50"),
-					:headers => {"Authorization" => authorization}
-				)
-				ws.onopen do
-					output("Connected")
+		heartbeat = 70 # Seconds
+		counter = 0
+		lastSeen = 0
+
+		EM.epoll
+		EM.run do
+			ws = WebSocket::EventMachine::Client.connect(
+				:uri => buildURI("wss://ws.cloud.docker.com/api/app/v1/service/#{uuid}/logs/?tail=50"),
+				:headers => {"Authorization" => authorization}
+			)
+
+			ws.onopen do
+				output("Connected")
+			end
+
+			ws.onerror do |e|
+				output("Error: #{e}")
+			end
+
+			ws.onmessage do |msg, type|
+				counter += 1
+				msg_json = JSON.parse(msg)
+				if(msg_json["log"].nil?)
+					output(msg)
+				else
+					output(msg_json["log"].gsub(/^[\dT:.-]+Z /, ''))
 				end
+			end
 
-				ws.onmessage do |msg, type|
-					msg_json = JSON.parse(msg)
-					if(msg_json["log"].nil?)
-						output(msg)
-					else
-						output(msg_json["log"].gsub(/^[\dT:.-]+Z /, ''))
-					end
+			timer = EM.add_periodic_timer heartbeat, proc {
+				if lastSeen == counter
+					puts "No new messages in #{heartbeat} seconds.  Reconnecting"
+					timer.cancel
+					ws.close
 				end
+				lastSeen = counter
+			}
 
-				ws.onerror do |e|
-					output("Error: #{e}")
-				end
-
-				ws.onclose do |code, reason|
-					output("Disconnected with status code: #{code}")
-					if(finished == false)
-						output("Something went wrong with web socket for getting logs.  Disconnected with status code: #{code}. Reconnecting...")
-						threadLogger(uuid)
-					else
-						output("Disconnected with status code: #{code}")
-					end
-				end
-
+			ws.onclose do |code, msg|
+				output("Disconnected with status code: #{code}: #{msg}")
+				runLogger(uuid)
 			end
 		end
+
 	end
 
 	def output(out)
